@@ -26,12 +26,12 @@ namespace Marvin.IDP
                         AllowedGrantTypes = GrantTypes.Code,
                         RedirectUris =
                         {
-                            "https://localhost:7184/signing-oidc"
+                            "https://localhost:7184/signin-oidc"
                         },
                         AllowedScopes =
                         {
                             IdentityServerConstants.StandardScopes.OpenId,
-                            IdentityServerConstants.StandardScopes.Profile                            
+                            IdentityServerConstants.StandardScopes.Profile
                         },
                         ClientSecrets =
                         {
