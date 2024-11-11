@@ -1,4 +1,5 @@
-﻿using Duende.IdentityServer.Models;
+﻿using Duende.IdentityServer;
+using Duende.IdentityServer.Models;
 
 namespace Marvin.IDP
 {
@@ -17,6 +18,26 @@ namespace Marvin.IDP
 
         public static IEnumerable<Client> Clients =>
             new Client[]
-                { };
+                {
+                    new Client()
+                    {
+                        ClientName = "Image Galllery",
+                        ClientId = "imagegalleryclient",
+                        AllowedGrantTypes = GrantTypes.Code,
+                        RedirectUris =
+                        {
+                            "https://localhost:7184/signing-oidc"
+                        },
+                        AllowedScopes =
+                        {
+                            IdentityServerConstants.StandardScopes.OpenId,
+                            IdentityServerConstants.StandardScopes.Profile                            
+                        },
+                        ClientSecrets =
+                        {
+                            new Secret("secret".Sha256())
+                        }
+                    }
+                };
     }
 }
