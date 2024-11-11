@@ -57,6 +57,13 @@
         "ImageGallery.API": {},
         "ImageGallery.Client": {}
       }
+    },
+    "API & Client & IDP": {
+      "Projects": {
+        "ImageGallery.Client": {},
+        "ImageGallery.API": {},
+        "Marvin.IDP": {}
+      }
     }
   }
 }
