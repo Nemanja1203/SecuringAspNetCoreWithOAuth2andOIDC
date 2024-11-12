@@ -14,13 +14,16 @@ builder.Services.AddControllersWithViews()
 
 JsonWebTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
+// Registers required services for access token management
+builder.Services.AddAccessTokenManagement();
+
 // create an HttpClient used for accessing the API
 builder.Services.AddHttpClient("APIClient", client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["ImageGalleryAPIRoot"]);
     client.DefaultRequestHeaders.Clear();
     client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
-});
+}).AddUserAccessTokenHandler();
 
 builder.Services
     .AddAuthentication(options =>

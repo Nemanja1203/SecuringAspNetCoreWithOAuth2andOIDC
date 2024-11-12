@@ -31,8 +31,16 @@ namespace ImageGallery.API.Controllers
         [HttpGet()]
         public async Task<ActionResult<IEnumerable<Image>>> GetImages()
         {
+            var ownerId = User.Claims
+                .FirstOrDefault(c => c.Type == "sub")?.Value;
+
+            if (ownerId == null)
+            {
+                throw new Exception("User identifier is missing from token.");
+            }
+
             // get from repo
-            var imagesFromRepo = await _galleryRepository.GetImagesAsync();
+            var imagesFromRepo = await _galleryRepository.GetImagesAsync(ownerId);
 
             // map to model
             var imagesToReturn = _mapper.Map<IEnumerable<Image>>(imagesFromRepo);
@@ -43,7 +51,7 @@ namespace ImageGallery.API.Controllers
 
         [HttpGet("{id}", Name = "GetImage")]
         public async Task<ActionResult<Image>> GetImage(Guid id)
-        {          
+        {
             var imageFromRepo = await _galleryRepository.GetImageAsync(id);
 
             if (imageFromRepo == null)
