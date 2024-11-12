@@ -31,9 +31,19 @@ builder.Services
         options.ClientId = "imagegalleryclient"; // Should match cliend id on the level of Identity Provider
         options.ClientSecret = "secret"; // Should match secret we configured on the level of Identity Provider
         options.ResponseType = "code";
+
         //options.Scope.Add("openid"); // By default openid and profile scopes are requested by the middleware
         //options.Scope.Add("profile");
-        //options.CallbackPath = new PathString("signin-oidc");
+
+        //options.CallbackPath = new PathString("signin-oidc"); // Set up by default
+
+        // SignedOutCallbackPath: default = host:port/signout-callback-oidc.
+        // Must match with the post logout redirect URI at IDP client ocnfig if
+        // you want to automatically return to the application after logging out
+        // of IdentityServer.
+        // To change, set SignedOutCallbackPath
+        // eg: SignedOutCallbackPath = "pathaftersighout"
+        //options.SignedOutCallbackPath = new PathString("signout-callback-oidc"); // This is default value
         options.SaveTokens = true;
     });
 
