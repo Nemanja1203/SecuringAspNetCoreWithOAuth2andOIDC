@@ -10,14 +10,20 @@ namespace Marvin.IDP
             {
                 new IdentityResources.OpenId(),
                 new IdentityResources.Profile(),
-                new(name: "roles",
+                new IdentityResource(name: "roles",
                     displayName: "Your role(s)",
                     userClaims: new [] { "role" })
             };
 
+        public static IEnumerable<ApiResource> ApiResources =>
+            new ApiResource[]
+            {
+                new ApiResource("imagegalleryapi", "Image Galiry API")
+            };
+
         public static IEnumerable<ApiScope> ApiScopes =>
             new ApiScope[]
-                { };
+            { };
 
         public static IEnumerable<Client> Clients =>
             new Client[]
@@ -39,7 +45,8 @@ namespace Marvin.IDP
                         {
                             IdentityServerConstants.StandardScopes.OpenId,
                             IdentityServerConstants.StandardScopes.Profile,
-                            "roles"
+                            "roles",
+                            "imagegalleryapi"
                         },
                         ClientSecrets =
                         {
