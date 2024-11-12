@@ -56,6 +56,11 @@ builder.Services
         options.ClaimActions.DeleteClaim("sid");
         options.ClaimActions.DeleteClaim("idp");
         options.ClaimActions.MapJsonKey("role", "role");
+        options.TokenValidationParameters = new()
+        {
+            NameClaimType = "given_name",
+            RoleClaimType = "role"
+        };
     });
 
  
