@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OAuth.Claims;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.Net.Http.Headers;
@@ -38,6 +39,7 @@ builder.Services
 
         //options.Scope.Add("openid"); // By default openid and profile scopes are requested by the middleware
         //options.Scope.Add("profile");
+        options.Scope.Add("roles");
 
         //options.CallbackPath = new PathString("signin-oidc"); // Set up by default
 
@@ -50,9 +52,10 @@ builder.Services
         //options.SignedOutCallbackPath = new PathString("signout-callback-oidc"); // This is default value
         options.SaveTokens = true;
         options.GetClaimsFromUserInfoEndpoint = true;
-        options.ClaimActions.Remove("aud"); // Removing filter that removes aud claim (aud will be present now)
+        options.ClaimActions.Remove("aud"); // Removing filter that removes aud claim from Claims Identity (aud will be present now)
         options.ClaimActions.DeleteClaim("sid");
         options.ClaimActions.DeleteClaim("idp");
+        options.ClaimActions.MapJsonKey("role", "role");
     });
 
  
