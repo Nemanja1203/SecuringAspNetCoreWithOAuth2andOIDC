@@ -11,6 +11,7 @@ builder.Services.AddControllers()
 
 builder.Services.AddDbContext<GalleryContext>(options =>
 {
+    // NOTE: (nm) Here we define that we are using SQL Lite
     options.UseSqlite(
         builder.Configuration["ConnectionStrings:ImageGalleryDBConnectionString"]);
 });

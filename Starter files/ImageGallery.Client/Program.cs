@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -49,6 +50,9 @@ builder.Services
         //options.SignedOutCallbackPath = new PathString("signout-callback-oidc"); // This is default value
         options.SaveTokens = true;
         options.GetClaimsFromUserInfoEndpoint = true;
+        options.ClaimActions.Remove("aud"); // Removing filter that removes aud claim (aud will be present now)
+        options.ClaimActions.DeleteClaim("sid");
+        options.ClaimActions.DeleteClaim("idp");
     });
 
  
