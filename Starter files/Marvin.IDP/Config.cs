@@ -26,7 +26,7 @@ namespace Marvin.IDP
                 new ApiResource(
                     name: "imagegalleryapi", 
                     displayName: "Image Gallery API",
-                    userClaims: ["role"])
+                    userClaims: ["role", "country"])
                 {
                     Scopes = { "imagegalleryapi.fullaccess" }
                 }
