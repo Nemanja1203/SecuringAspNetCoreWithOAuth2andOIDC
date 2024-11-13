@@ -33,13 +33,9 @@ public static class TestUsers
                     Claims =
                     {
                         new Claim("role", "FreeUser"),
-                        //new Claim(JwtClaimTypes.Name, "Alice Smith"),
                         new Claim(JwtClaimTypes.GivenName, "David"),
                         new Claim(JwtClaimTypes.FamilyName, "Flagg"),
-                        //new Claim(JwtClaimTypes.Email, "AliceSmith@email.com"),
-                        //new Claim(JwtClaimTypes.EmailVerified, "true", ClaimValueTypes.Boolean),
-                        //new Claim(JwtClaimTypes.WebSite, "http://alice.com"),
-                        //new Claim(JwtClaimTypes.Address, JsonSerializer.Serialize(address), IdentityServerConstants.ClaimValueTypes.Json)
+                        new Claim("country", "nl")
                     }
                 },
                 new TestUser
@@ -50,13 +46,9 @@ public static class TestUsers
                     Claims =
                     {
                         new Claim("role", "PayingUser"),
-                        //new Claim(JwtClaimTypes.Name, "Bob Smith"),
                         new Claim(JwtClaimTypes.GivenName, "Emma"),
                         new Claim(JwtClaimTypes.FamilyName, "Flagg"),
-                        //new Claim(JwtClaimTypes.Email, "BobSmith@email.com"),
-                        //new Claim(JwtClaimTypes.EmailVerified, "true", ClaimValueTypes.Boolean),
-                        //new Claim(JwtClaimTypes.WebSite, "http://bob.com"),
-                        //new Claim(JwtClaimTypes.Address, JsonSerializer.Serialize(address), IdentityServerConstants.ClaimValueTypes.Json)
+                        new Claim("country", "be")
                     }
                 }
             };

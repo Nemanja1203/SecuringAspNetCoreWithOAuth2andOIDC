@@ -13,7 +13,11 @@ namespace Marvin.IDP
                 new IdentityResource(
                     name: "roles",
                     displayName: "Your role(s)",
-                    userClaims: ["role"])
+                    userClaims: ["role"]),
+                new IdentityResource(
+                    name: "country",
+                    displayName: "The country you're living in",
+                    userClaims: ["country"])
             };
 
         public static IEnumerable<ApiResource> ApiResources =>
@@ -56,6 +60,7 @@ namespace Marvin.IDP
                             IdentityServerConstants.StandardScopes.Profile,
                             "roles",
                             "imagegalleryapi.fullaccess",
+                            "country"
                         },
                         ClientSecrets =
                         {
