@@ -10,15 +10,19 @@ namespace Marvin.IDP
             {
                 new IdentityResources.OpenId(),
                 new IdentityResources.Profile(),
-                new IdentityResource(name: "roles",
+                new IdentityResource(
+                    name: "roles",
                     displayName: "Your role(s)",
-                    userClaims: new [] { "role" })
+                    userClaims: ["role"])
             };
 
         public static IEnumerable<ApiResource> ApiResources =>
             new ApiResource[]
             {
-                new ApiResource("imagegalleryapi", "Image Gallery API")
+                new ApiResource(
+                    name: "imagegalleryapi", 
+                    displayName: "Image Gallery API",
+                    userClaims: ["role"])
                 {
                     Scopes = { "imagegalleryapi.fullaccess" }
                 }
