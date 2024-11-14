@@ -44,6 +44,11 @@ builder.Services.AddAuthorization(authorizationOptions =>
 {
     authorizationOptions.AddPolicy("UserCanAddImage",
         AuthorizationPolicies.CanAddImage());
+    authorizationOptions.AddPolicy("ClientApplicationCanWrite", 
+        policyBuilder =>
+        {
+            policyBuilder.RequireClaim("scope", "imagegalleryapi.write");
+        });
 });
 
 var app = builder.Build();

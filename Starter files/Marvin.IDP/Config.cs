@@ -28,14 +28,20 @@ namespace Marvin.IDP
                     displayName: "Image Gallery API",
                     userClaims: ["role", "country"])
                 {
-                    Scopes = { "imagegalleryapi.fullaccess" }
+                    Scopes = { 
+                        "imagegalleryapi.fullaccess",
+                        "imagegalleryapi.read",
+                        "imagegalleryapi.write"
+                    }
                 }
             };
 
         public static IEnumerable<ApiScope> ApiScopes =>
             new ApiScope[]
             {
-                new ApiScope("imagegalleryapi.fullaccess")
+                new ApiScope("imagegalleryapi.fullaccess"),
+                new ApiScope("imagegalleryapi.read"),
+                new ApiScope("imagegallryapi.write")
             };
 
         public static IEnumerable<Client> Clients =>
@@ -59,7 +65,8 @@ namespace Marvin.IDP
                             IdentityServerConstants.StandardScopes.OpenId,
                             IdentityServerConstants.StandardScopes.Profile,
                             "roles",
-                            "imagegalleryapi.fullaccess",
+                            //"imagegalleryapi.fullaccess",
+                            "imagegalleryapi.read",
                             "country"
                         },
                         ClientSecrets =
