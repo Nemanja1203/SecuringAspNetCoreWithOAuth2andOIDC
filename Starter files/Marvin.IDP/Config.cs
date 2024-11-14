@@ -32,7 +32,8 @@ namespace Marvin.IDP
                         "imagegalleryapi.fullaccess",
                         "imagegalleryapi.read",
                         "imagegalleryapi.write"
-                    }
+                    },
+                    ApiSecrets = { new Secret("apisecret".Sha256()) }
                 }
             };
 
@@ -60,6 +61,8 @@ namespace Marvin.IDP
                         //RefreshTokenExpiration = TokenExpiration.Sliding,
                         //SlidingRefreshTokenLifetime = 3600,
                         UpdateAccessTokenClaimsOnRefresh = true,
+                        //AccessTokenType = AccessTokenType.Jwt,
+                        AccessTokenType = AccessTokenType.Reference,
                         RedirectUris =
                         {
                             "https://localhost:7184/signin-oidc"
