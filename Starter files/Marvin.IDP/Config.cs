@@ -41,7 +41,7 @@ namespace Marvin.IDP
             {
                 new ApiScope("imagegalleryapi.fullaccess"),
                 new ApiScope("imagegalleryapi.read"),
-                new ApiScope("imagegallryapi.write")
+                new ApiScope("imagegalleryapi.write")
             };
 
         public static IEnumerable<Client> Clients =>
@@ -67,6 +67,7 @@ namespace Marvin.IDP
                             "roles",
                             //"imagegalleryapi.fullaccess",
                             "imagegalleryapi.read",
+                            "imagegalleryapi.write",
                             "country"
                         },
                         ClientSecrets =
