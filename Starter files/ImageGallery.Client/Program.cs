@@ -47,7 +47,8 @@ builder.Services
         //options.Scope.Add("openid"); // By default openid and profile scopes are requested by the middleware
         //options.Scope.Add("profile");
         options.Scope.Add("roles");
-        options.Scope.Add("imagegalleryapi.fullaccess");
+        //options.Scope.Add("imagegalleryapi.fullaccess");
+        options.Scope.Add("imagegalleryapi.read");
         options.Scope.Add("country");
 
         //options.CallbackPath = new PathString("signin-oidc"); // Set up by default
