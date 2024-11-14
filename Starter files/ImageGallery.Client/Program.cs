@@ -24,7 +24,7 @@ builder.Services.AddHttpClient("APIClient", client =>
     client.BaseAddress = new Uri(builder.Configuration["ImageGalleryAPIRoot"]);
     client.DefaultRequestHeaders.Clear();
     client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
-}).AddUserAccessTokenHandler();
+}).AddUserAccessTokenHandler(); // This wiill handle refresh token
 
 builder.Services
     .AddAuthentication(options =>
@@ -51,6 +51,7 @@ builder.Services
         options.Scope.Add("imagegalleryapi.read");
         options.Scope.Add("imagegalleryapi.write");
         options.Scope.Add("country");
+        options.Scope.Add("offline_access");
 
         //options.CallbackPath = new PathString("signin-oidc"); // Set up by default
 
