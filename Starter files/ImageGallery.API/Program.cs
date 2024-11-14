@@ -36,26 +36,26 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 JsonWebTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    //.AddJwtBearer(options =>
-    //{
-    //    options.Authority = "https://localhost:5001";
-    //    options.Audience = "imagegalleryapi"; // Setting valid value for audience
-    //    options.TokenValidationParameters = new() 
-    //    {
-    //        NameClaimType = "given_name",
-    //        RoleClaimType = "role",
-    //        ValidTypes = new[] { "at+jwt" }, // Protection agains JWT confusion attack
-    //        ClockSkew = TimeSpan.FromSeconds(5)
-    //    };
-    //});
-    .AddOAuth2Introspection(options =>
+    .AddJwtBearer(options =>
     {
         options.Authority = "https://localhost:5001";
-        options.ClientId = "imagegalleryapi";
-        options.ClientSecret = "apisecret";
-        options.NameClaimType = "given_name";
-        options.RoleClaimType = "role";
+        options.Audience = "imagegalleryapi"; // Setting valid value for audience
+        options.TokenValidationParameters = new()
+        {
+            NameClaimType = "given_name",
+            RoleClaimType = "role",
+            ValidTypes = new[] { "at+jwt" }, // Protection agains JWT confusion attack
+            ClockSkew = TimeSpan.FromSeconds(5)
+        };
     });
+//.AddOAuth2Introspection(options =>
+//{
+//    options.Authority = "https://localhost:5001";
+//    options.ClientId = "imagegalleryapi";
+//    options.ClientSecret = "apisecret";
+//    options.NameClaimType = "given_name";
+//    options.RoleClaimType = "role";
+//});
 
 builder.Services.AddAuthorization(authorizationOptions =>
 {
