@@ -86,6 +86,45 @@ namespace Marvin.IDP
                             new Secret("secret".Sha256())
                         },
                         RequireConsent = true
+                    },
+                    new()
+                    {
+                        ClientName = "Image Galllery BFF",
+                        ClientId = "imagegallerybff",
+                        AllowedGrantTypes = GrantTypes.Code,
+                        AllowOfflineAccess = true,
+                        IdentityTokenLifetime = 300, // 5 minutes
+                        AuthorizationCodeLifetime = 300, // 5 minutes
+                        AccessTokenLifetime = 120, // defaults to 3.600 = 1h
+                        AbsoluteRefreshTokenLifetime = 2592000, // 30 days
+                        //RefreshTokenExpiration = TokenExpiration.Sliding,
+                        //SlidingRefreshTokenLifetime = 3600,
+                        UpdateAccessTokenClaimsOnRefresh = true,
+                        //AccessTokenType = AccessTokenType.Jwt,
+                        AccessTokenType = AccessTokenType.Reference,
+                        RedirectUris =
+                        {
+                            "https://localhost:7119/signin-oidc"
+                        },
+                        PostLogoutRedirectUris =
+                        {
+                            "https://localhost:7119/signout-callback-oidc"
+                        },
+                        AllowedScopes =
+                        {
+                            IdentityServerConstants.StandardScopes.OpenId,
+                            IdentityServerConstants.StandardScopes.Profile,
+                            "roles",
+                            //"imagegalleryapi.fullaccess",
+                            "imagegalleryapi.read",
+                            "imagegalleryapi.write",
+                            "country"
+                        },
+                        ClientSecrets =
+                        {
+                            new Secret("anothersecret".Sha256())
+                        },
+                        RequireConsent = true
                     }
                 };
     }
