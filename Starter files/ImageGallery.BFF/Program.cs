@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.IdentityModel.JsonWebTokens;
+using Duende.Bff.Yarp;
+using Duende.Bff;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +11,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(configure =>
         configure.JsonSerializerOptions.PropertyNamingPolicy = null);
+
+builder.Services.AddBff()
+    .AddRemoteApis();
 
 builder.Services.AddHttpClient("IDPClient", client =>
 {
@@ -93,6 +98,11 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapRemoteBffApiEndpoint(
+    localPath: "/bff/images",
+    apiAddress: "https://localhost:7075/api/images")
+    .RequireAccessToken(TokenType.User);
 
 app.MapControllerRoute(
     name: "default",
