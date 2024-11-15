@@ -10,6 +10,11 @@ builder.Services.AddControllersWithViews()
     .AddJsonOptions(configure =>
         configure.JsonSerializerOptions.PropertyNamingPolicy = null);
 
+builder.Services.AddHttpClient("IDPClient", client =>
+{
+    client.BaseAddress = new Uri("https://localhost:5001/");
+});
+
 JsonWebTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
 // IMPORTANT:
