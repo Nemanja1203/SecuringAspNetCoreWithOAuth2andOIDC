@@ -65,8 +65,15 @@
     },
     "API & Client & IDP": {
       "Projects": {
-        "ImageGallery.Client": {},
         "ImageGallery.API": {},
+        "ImageGallery.Client": {},
+        "Marvin.IDP": {}
+      }
+    },
+    "API & BFF & IDP": {
+      "Projects": {
+        "ImageGallery.API": {},
+        "ImageGallery.BFF": {},
         "Marvin.IDP": {}
       }
     }
