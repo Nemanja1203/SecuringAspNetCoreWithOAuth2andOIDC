@@ -1,3 +1,5 @@
+using Marvin.IDP.DbContexts;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 namespace Marvin.IDP
@@ -8,6 +10,12 @@ namespace Marvin.IDP
         {
             // uncomment if you want to add a UI
             builder.Services.AddRazorPages();
+
+            builder.Services.AddDbContext<IdentityDbContext>(options =>
+            {
+                options.UseSqlite(
+                    builder.Configuration["ConnectionStrings:MarvinIdentityDBConnectionString"]);
+            });
 
             builder.Services.AddIdentityServer(options =>
                 {
