@@ -85,7 +85,7 @@ namespace Marvin.IDP
                         {
                             new Secret("secret".Sha256())
                         },
-                        RequireConsent = true
+                        RequireConsent = false
                     }
                 };
     }
