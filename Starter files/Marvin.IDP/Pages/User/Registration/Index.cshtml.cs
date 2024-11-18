@@ -50,7 +50,8 @@ namespace Marvin.IDP.Pages.User.Registration
                 //Password = Input.Password,
                 UserName = Input.UserName,
                 Subject = Guid.NewGuid().ToString(),
-                Active = true
+                Email = Input.Email,
+                Active = false
             };
 
             userToCreate.Claims.Add(new Entities.UserClaim()
@@ -74,22 +75,31 @@ namespace Marvin.IDP.Pages.User.Registration
             _localUserService.AddUser(userToCreate, Input.Password);
             await _localUserService.SaveChangesAsync();
 
-            // Issue authentication cookie (log the user in)
-            var isUser = new IdentityServerUser(userToCreate.Subject)
-            {
-                DisplayName = userToCreate.UserName
-            };
-            await HttpContext.SignInAsync(isUser);
+            // create an activation link - we need an absolute URL, therefore
+            // we use Url.PageLink instead of Url.Page
+            var activationLink = Url.PageLink("/user/activation/index",
+                values: new { securityCode = userToCreate.SecurityCode });
 
-            // continue with the flow
-            if (_interaction.IsValidReturnUrl(Input.ReturnUrl)
-                || Url.IsLocalUrl(Input.ReturnUrl))
-            {
-                return Redirect(Input.ReturnUrl);
-            }
+            Console.WriteLine("Activation Link:");
+            Console.WriteLine(activationLink);
 
-            return Redirect("~/");
+            return Redirect("~/User/ActivationCodeSent");
 
+            //// Issue authentication cookie (log the user in)
+            //var isUser = new IdentityServerUser(userToCreate.Subject)
+            //{
+            //    DisplayName = userToCreate.UserName
+            //};
+            //await HttpContext.SignInAsync(isUser);
+
+            //// continue with the flow
+            //if (_interaction.IsValidReturnUrl(Input.ReturnUrl)
+            //    || Url.IsLocalUrl(Input.ReturnUrl))
+            //{
+            //    return Redirect(Input.ReturnUrl);
+            //}
+
+            //return Redirect("~/");
         }
 
         private void BuildModel(string returnUrl)

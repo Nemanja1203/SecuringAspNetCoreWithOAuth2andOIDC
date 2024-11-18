@@ -16,6 +16,8 @@ namespace Marvin.IDP.Services
 
         Task<bool> IsUserActive(string subject);
 
+        Task<bool> ActivateUserAsync(string securityCode);
+
         Task<bool> SaveChangesAsync();
     }
 }
