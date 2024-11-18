@@ -22,6 +22,8 @@ namespace Marvin.IDP.Pages.User.Activation
 
         public async Task<IActionResult> OnGet(string securityCode)
         {
+            Input = new InputModel();
+
             if (await _localUserService.ActivateUserAsync(securityCode))
             {
                 Input.Message = "Your account was successfully activated. " +
