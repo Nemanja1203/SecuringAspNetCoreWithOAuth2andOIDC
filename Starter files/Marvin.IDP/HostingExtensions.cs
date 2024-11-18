@@ -1,5 +1,6 @@
 using Marvin.IDP.DbContexts;
 using Marvin.IDP.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -13,6 +14,7 @@ namespace Marvin.IDP
             builder.Services.AddRazorPages();
 
             builder.Services.AddScoped<ILocalUserService, LocalUserService>();
+            builder.Services.AddScoped<IPasswordHasher<Entities.User>, PasswordHasher<Entities.User>>();
 
             builder.Services.AddDbContext<IdentityDbContext>(options =>
             {

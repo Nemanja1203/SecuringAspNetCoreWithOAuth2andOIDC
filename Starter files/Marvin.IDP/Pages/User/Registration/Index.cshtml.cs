@@ -47,7 +47,7 @@ namespace Marvin.IDP.Pages.User.Registration
             // create user and claims
             var userToCreate = new Entities.User
             {
-                Password = Input.Password,
+                //Password = Input.Password,
                 UserName = Input.UserName,
                 Subject = Guid.NewGuid().ToString(),
                 Active = true
@@ -71,7 +71,7 @@ namespace Marvin.IDP.Pages.User.Registration
                 Value = Input.FamilyName
             });
 
-            _localUserService.AddUser(userToCreate);
+            _localUserService.AddUser(userToCreate, Input.Password);
             await _localUserService.SaveChangesAsync();
 
             // Issue authentication cookie (log the user in)
