@@ -57,6 +57,13 @@
         "ImageGallery.API": {}
       }
     },
+    "Marvin.IDP": {
+      "Projects": {
+        "Marvin.IDP": {
+          "ProfileName": "IIS Express"
+        }
+      }
+    },
     "API & Client": {
       "Projects": {
         "ImageGallery.API": {},
