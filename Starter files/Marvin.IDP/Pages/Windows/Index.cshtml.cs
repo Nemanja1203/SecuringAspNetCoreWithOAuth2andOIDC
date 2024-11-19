@@ -1,6 +1,7 @@
 using Duende.IdentityServer;
 using IdentityModel;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Security.Claims;
@@ -8,6 +9,8 @@ using System.Security.Principal;
 
 namespace Marvin.IDP.Pages.Windows
 {
+    [AllowAnonymous]
+    [SecurityHeaders]
     public class IndexModel : PageModel
     {
         public async Task<IActionResult> OnGet(string returnUrl)
@@ -28,7 +31,7 @@ namespace Marvin.IDP.Pages.Windows
                     AdditionalClaims = roles.ToList(),
                 };
 
-                await HttpContext.SignInAsync(user);
+                await HttpContext.SignInAsync(user); // This creates the local cookie
                 return LocalRedirect(returnUrl);
             }
             else
