@@ -69,6 +69,17 @@ namespace Marvin.IDP
                         options.SaveTokens = true;
                     });
 
+            builder.Services
+                .AddAuthentication()
+                .AddFacebook(
+                    authenticationScheme: "Facebook",
+                    options =>
+                    {
+                        options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
+                        options.AppId = "1283327816432909";
+                        options.AppSecret = "secret-goes-here";
+                    });
+
             return builder.Build();
         }
 
