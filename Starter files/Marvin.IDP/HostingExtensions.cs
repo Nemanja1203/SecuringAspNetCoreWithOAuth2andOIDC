@@ -1,8 +1,12 @@
 using Marvin.IDP.DbContexts;
 using Marvin.IDP.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Duende.IdentityServer;
 
 namespace Marvin.IDP
 {
@@ -46,6 +50,25 @@ namespace Marvin.IDP
                 .AddInMemoryApiScopes(Config.ApiScopes)
                 .AddInMemoryClients(Config.Clients);
 
+            builder.Services
+                .AddAuthentication()
+                .AddOpenIdConnect(
+                    authenticationScheme: "AAD", 
+                    displayName: "Azure Active Directory (Entra)...", 
+                    options =>
+                    {
+                        options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme; // "idsrv.external"
+                        options.Authority = "https://login.microsoftonline.com/1a18d5f5-4e6c-44e2-afa2-4054f1113e1b/v2.0"; // Address of our Identity Provider
+                        options.ClientId = "9af802c1-32a6-40c8-99f5-15d367e59814"; // Should match cliend id on the level of Identity Provider
+                        options.ClientSecret = "secret-goes-here"; // Should match secret we configured on the level of Identity Provider
+                        options.ResponseType = "code";
+                        options.CallbackPath = new PathString("/signin-aad/");
+                        options.SignedOutCallbackPath = new PathString("/signout-aad/");
+                        options.Scope.Add("email");
+                        options.Scope.Add("offline_access");
+                        options.SaveTokens = true;
+                    });
+
             return builder.Build();
         }
 
@@ -63,7 +86,7 @@ namespace Marvin.IDP
             app.UseRouting();
 
             app.UseIdentityServer();
-             
+
             // uncomment if you want to add a UI
             app.UseAuthorization();
             app.MapRazorPages().RequireAuthorization();
