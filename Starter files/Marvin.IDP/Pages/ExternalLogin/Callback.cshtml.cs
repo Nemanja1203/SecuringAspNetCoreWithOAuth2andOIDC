@@ -110,7 +110,7 @@ public class Callback : PageModel
             mappedClaims.Add(new Claim("country", "be"));
 
             // auto-provision the user
-            _localUserService.AutoProvisionUser(provider, providerUserId, mappedClaims.ToList());
+            user = _localUserService.AutoProvisionUser(provider, providerUserId, mappedClaims.ToList());
             await _localUserService.SaveChangesAsync();
         }
 
