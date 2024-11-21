@@ -5,7 +5,6 @@ using System.Security.Claims;
 using Duende.IdentityServer;
 using Duende.IdentityServer.Events;
 using Duende.IdentityServer.Services;
-using Duende.IdentityServer.Test;
 using IdentityModel;
 using Marvin.IDP.Services;
 using Microsoft.AspNetCore.Authentication;
@@ -23,6 +22,22 @@ public class Callback : PageModel
     private readonly ILogger<Callback> _logger;
     private readonly IEventService _events;
     private readonly ILocalUserService _localUserService;
+
+    private readonly Dictionary<string, string> _facebookClaimTypeMap = new()
+    {
+        { 
+            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname",
+            JwtClaimTypes.GivenName
+        },
+        {
+            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname",
+            JwtClaimTypes.FamilyName
+        },
+        {
+            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress",
+            JwtClaimTypes.Email
+        }
+    };
 
     public Callback(
         IIdentityServerInteractionService interaction,
@@ -64,7 +79,8 @@ public class Callback : PageModel
                           externalUser.FindFirst(ClaimTypes.NameIdentifier) ??
                           throw new InvalidOperationException("Unknown userid");
 
-        var provider = result.Properties.Items["scheme"] ?? throw new InvalidOperationException("Null scheme in authentiation properties");
+        var provider = result.Properties.Items["scheme"] 
+            ?? throw new InvalidOperationException("Null scheme in authentiation properties");
         var providerUserId = userIdClaim.Value;
 
         // find external user
@@ -75,8 +91,26 @@ public class Callback : PageModel
             var claims = externalUser.Claims.ToList();
             claims.Remove(userIdClaim);
 
+            var mappedClaims = new List<Claim>();
+            // map the claims, and ignore those for which no mapping exists
+            foreach (var claim in claims)
+            {
+                //if (provider = "Facebook")
+                if (_facebookClaimTypeMap.ContainsKey(claim.Type))
+                {
+                    mappedClaims.Add(new Claim(_facebookClaimTypeMap[claim.Type], claim.Value));
+                }
+            }
+
+            // we need additional claims like: rola claim and country claim
+            // we could ask for that by adding an additional view (lige Registration view)
+
+            // hardcoding values so we can continue
+            mappedClaims.Add(new Claim("role", "FreeUser"));
+            mappedClaims.Add(new Claim("country", "be"));
+
             // auto-provision the user
-            _localUserService.AutoProvisionUser(provider, providerUserId, claims.ToList());
+            _localUserService.AutoProvisionUser(provider, providerUserId, mappedClaims.ToList());
             await _localUserService.SaveChangesAsync();
         }
 
