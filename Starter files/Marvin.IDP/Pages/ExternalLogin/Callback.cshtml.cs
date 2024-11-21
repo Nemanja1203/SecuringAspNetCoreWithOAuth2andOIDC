@@ -25,16 +25,24 @@ public class Callback : PageModel
 
     private readonly Dictionary<string, string> _facebookClaimTypeMap = new()
     {
-        { 
-            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname",
+        {
+            ClaimTypes.GivenName, //"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname",
             JwtClaimTypes.GivenName
         },
         {
-            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname",
+            ClaimTypes.Surname, //"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname",
             JwtClaimTypes.FamilyName
         },
         {
-            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress",
+            ClaimTypes.Email, // "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress",
+            JwtClaimTypes.Email
+        }
+    };
+
+    private readonly Dictionary<string, string> _aadClaimTypeMap = new()
+    {
+        {
+            ClaimTypes.Email, // "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress",
             JwtClaimTypes.Email
         }
     };
@@ -46,25 +54,25 @@ public class Callback : PageModel
         ILocalUserService localUserService)
     {
         // this is where you would plug in your own custom identity management library (e.g. ASP.NET Identity)
- 
+
         _interaction = interaction;
         _logger = logger;
         _localUserService = localUserService;
         _events = events;
     }
-        
+
     public async Task<IActionResult> OnGet()
     {
         // read external identity from the temporary cookie
         var result = await HttpContext.AuthenticateAsync(IdentityServerConstants.ExternalCookieAuthenticationScheme);
         if (result.Succeeded != true)
         {
-            throw new InvalidOperationException($"External authentication error: { result.Failure }");
+            throw new InvalidOperationException($"External authentication error: {result.Failure}");
         }
 
-        var externalUser = result.Principal ?? 
+        var externalUser = result.Principal ??
             throw new InvalidOperationException("External authentication produced a null Principal");
-		
+
         if (_logger.IsEnabled(LogLevel.Debug))
         {
             var externalClaims = externalUser.Claims.Select(c => $"{c.Type}: {c.Value}");
@@ -79,7 +87,7 @@ public class Callback : PageModel
                           externalUser.FindFirst(ClaimTypes.NameIdentifier) ??
                           throw new InvalidOperationException("Unknown userid");
 
-        var provider = result.Properties.Items["scheme"] 
+        var provider = result.Properties.Items["scheme"]
             ?? throw new InvalidOperationException("Null scheme in authentiation properties");
         var providerUserId = userIdClaim.Value;
 
@@ -91,27 +99,55 @@ public class Callback : PageModel
             var claims = externalUser.Claims.ToList();
             claims.Remove(userIdClaim);
 
-            var mappedClaims = new List<Claim>();
-            // map the claims, and ignore those for which no mapping exists
-            foreach (var claim in claims)
+            // different external login providers often require different wayso of handling provisioning / linking
+            if (provider == "AAD")
             {
-                //if (provider = "Facebook")
-                if (_facebookClaimTypeMap.ContainsKey(claim.Type))
+                // get email claim value
+                var emailFromAzureAD = externalUser.Claims
+                    .FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+                if (!string.IsNullOrEmpty(emailFromAzureAD))
                 {
-                    mappedClaims.Add(new Claim(_facebookClaimTypeMap[claim.Type], claim.Value));
+                    // try to  find a user with matching email
+                    user = await _localUserService.GetUserByEmailAsync(emailFromAzureAD);
+
+                    // if it exists, add AAD as a provider
+                    if (user != null)
+                    {
+                        await _localUserService.AddExternalProviderToUser(user.Subject, provider, providerUserId);
+                        await _localUserService.SaveChangesAsync();
+                    }
+                    else
+                    {
+                        // note: creating a new user if no match is found is a common practice - we won't
+                        // do that, we already did that in our Facebook integration sample 
+                    }
                 }
             }
+            else if (provider == "Facebook")
+            {
+                var mappedClaims = new List<Claim>();
+                // map the claims, and ignore those for which no mapping exists
+                foreach (var claim in claims)
+                {
+                    if (_facebookClaimTypeMap.ContainsKey(claim.Type))
+                    {
+                        mappedClaims.Add(new Claim(_facebookClaimTypeMap[claim.Type], claim.Value));
+                    }
+                }
 
-            // we need additional claims like: rola claim and country claim
-            // we could ask for that by adding an additional view (lige Registration view)
+                // TODO: (nm) Add new view for additional claims (country)
+                // we need additional claims like: rola claim and country claim
+                // we could ask for that by adding an additional view (lige Registration view)
 
-            // hardcoding values so we can continue
-            mappedClaims.Add(new Claim("role", "FreeUser"));
-            mappedClaims.Add(new Claim("country", "be"));
+                // hardcoding values so we can continue
+                mappedClaims.Add(new Claim("role", "FreeUser"));
+                mappedClaims.Add(new Claim("country", "be"));
 
-            // auto-provision the user
-            user = _localUserService.AutoProvisionUser(provider, providerUserId, mappedClaims.ToList());
-            await _localUserService.SaveChangesAsync();
+                // auto-provision the user
+                user = _localUserService.AutoProvisionUser(provider, providerUserId, mappedClaims.ToList());
+                await _localUserService.SaveChangesAsync();
+            }
         }
 
         // this allows us to collect any additional claims or properties
@@ -120,7 +156,7 @@ public class Callback : PageModel
         var additionalLocalClaims = new List<Claim>();
         var localSignInProps = new AuthenticationProperties();
         CaptureExternalLoginContext(result, additionalLocalClaims, localSignInProps);
-            
+
         // issue authentication cookie for user
         var isuser = new IdentityServerUser(user.Subject)
         {

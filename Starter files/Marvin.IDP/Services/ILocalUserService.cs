@@ -9,6 +9,10 @@ namespace Marvin.IDP.Services
 
         User AutoProvisionUser(string provider, string providerIdentityKey, IEnumerable<Claim> claims);
 
+        Task<User> GetUserByEmailAsync(string email);
+
+        Task AddExternalProviderToUser(string subject, string provider, string providerIdentityKey);
+
         Task<bool> ValidateCredentialsAsync(string userName, string password);
 
         Task<IEnumerable<UserClaim>> GetUserClaimsBySubjectAsync(string subject);
