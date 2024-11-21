@@ -1,7 +1,6 @@
 // Copyright (c) Duende Software. All rights reserved.
 // See LICENSE in the project root for license information.
 
-using System.Security.Claims;
 using Duende.IdentityServer;
 using Duende.IdentityServer.Events;
 using Duende.IdentityServer.Services;
@@ -11,6 +10,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Security.Claims;
 
 namespace Marvin.IDP.Pages.ExternalLogin;
 
@@ -121,32 +121,72 @@ public class Callback : PageModel
                     {
                         // note: creating a new user if no match is found is a common practice - we won't
                         // do that, we already did that in our Facebook integration sample 
+                        var mappedClaims = new List<Claim>();
+                        // map the claims, and ignore those for which no mapping exists
+                        foreach (var claim in claims)
+                        {
+                            if (_aadClaimTypeMap.ContainsKey(claim.Type))
+                            {
+                                mappedClaims.Add(new Claim(_aadClaimTypeMap[claim.Type], claim.Value));
+                            }
+                        }
+
+                        // TODO: (nm) Add new view for additional claims (country)
+                        // we need additional claims like: rola claim and country claim
+                        // we could ask for that by adding an additional view (lige Registration view)
+
+                        // hardcoding values so we can continue
+                        mappedClaims.Add(new Claim("role", "FreeUser"));
+                        mappedClaims.Add(new Claim("country", "be"));
+
+                        // auto-provision the user
+                        user = _localUserService.AutoProvisionUser(provider, providerUserId, mappedClaims.ToList());
+                        await _localUserService.SaveChangesAsync();
                     }
                 }
             }
             else if (provider == "Facebook")
             {
-                var mappedClaims = new List<Claim>();
-                // map the claims, and ignore those for which no mapping exists
-                foreach (var claim in claims)
+                // get email claim value
+                var emailFromFacebook = externalUser.Claims
+                    .FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+                if (!string.IsNullOrEmpty(emailFromFacebook))
                 {
-                    if (_facebookClaimTypeMap.ContainsKey(claim.Type))
+                    // try to  find a user with matching email
+                    user = await _localUserService.GetUserByEmailAsync(emailFromFacebook);
+
+                    // if it exists, add Facebook as a provider
+                    if (user != null)
                     {
-                        mappedClaims.Add(new Claim(_facebookClaimTypeMap[claim.Type], claim.Value));
+                        await _localUserService.AddExternalProviderToUser(user.Subject, provider, providerUserId);
+                        await _localUserService.SaveChangesAsync();
+                    }
+                    else
+                    {
+                        var mappedClaims = new List<Claim>();
+                        // map the claims, and ignore those for which no mapping exists
+                        foreach (var claim in claims)
+                        {
+                            if (_facebookClaimTypeMap.ContainsKey(claim.Type))
+                            {
+                                mappedClaims.Add(new Claim(_facebookClaimTypeMap[claim.Type], claim.Value));
+                            }
+                        }
+
+                        // TODO: (nm) Add new view for additional claims (country)
+                        // we need additional claims like: rola claim and country claim
+                        // we could ask for that by adding an additional view (lige Registration view)
+
+                        // hardcoding values so we can continue
+                        mappedClaims.Add(new Claim("role", "FreeUser"));
+                        mappedClaims.Add(new Claim("country", "be"));
+
+                        // auto-provision the user
+                        user = _localUserService.AutoProvisionUser(provider, providerUserId, mappedClaims.ToList());
+                        await _localUserService.SaveChangesAsync();
                     }
                 }
-
-                // TODO: (nm) Add new view for additional claims (country)
-                // we need additional claims like: rola claim and country claim
-                // we could ask for that by adding an additional view (lige Registration view)
-
-                // hardcoding values so we can continue
-                mappedClaims.Add(new Claim("role", "FreeUser"));
-                mappedClaims.Add(new Claim("country", "be"));
-
-                // auto-provision the user
-                user = _localUserService.AutoProvisionUser(provider, providerUserId, mappedClaims.ToList());
-                await _localUserService.SaveChangesAsync();
             }
         }
 
