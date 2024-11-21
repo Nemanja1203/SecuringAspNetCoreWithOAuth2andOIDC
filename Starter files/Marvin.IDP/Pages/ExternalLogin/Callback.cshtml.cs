@@ -44,7 +44,11 @@ public class Callback : PageModel
         {
             ClaimTypes.Email, // "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress",
             JwtClaimTypes.Email
-        }
+        },
+        {
+            "name",
+            JwtClaimTypes.Name
+        },
     };
 
     public Callback(
