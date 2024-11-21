@@ -22,16 +22,19 @@ public class Callback : PageModel
     private readonly IIdentityServerInteractionService _interaction;
     private readonly ILogger<Callback> _logger;
     private readonly IEventService _events;
+    private readonly ILocalUserService _localUserService;
 
     public Callback(
         IIdentityServerInteractionService interaction,
         IEventService events,
-        ILogger<Callback> logger)
+        ILogger<Callback> logger,
+        ILocalUserService localUserService)
     {
         // this is where you would plug in your own custom identity management library (e.g. ASP.NET Identity)
  
         _interaction = interaction;
         _logger = logger;
+        _localUserService = localUserService;
         _events = events;
     }
         
@@ -64,19 +67,18 @@ public class Callback : PageModel
         var provider = result.Properties.Items["scheme"] ?? throw new InvalidOperationException("Null scheme in authentiation properties");
         var providerUserId = userIdClaim.Value;
 
-        //// find external user
-        //var user = _users.FindByExternalProvider(provider, providerUserId);
-        //if (user == null)
-        //{
-        //    // this might be where you might initiate a custom workflow for user registration
-        //    // in this sample we don't show how that would be done, as our sample implementation
-        //    // simply auto-provisions new external user
-        //    //
-        //    // remove the user id claim so we don't include it as an extra claim if/when we provision the user
-        //    var claims = externalUser.Claims.ToList();
-        //    claims.Remove(userIdClaim);
-        //    user = _users.AutoProvisionUser(provider, providerUserId, claims.ToList());
-        //}
+        // find external user
+        var user = await _localUserService.FindUserByExternalProviderAsync(provider, providerUserId);
+        if (user == null)
+        {
+            // remove the userId claim: that information is stored in the UserLogin table
+            var claims = externalUser.Claims.ToList();
+            claims.Remove(userIdClaim);
+
+            // auto-provision the user
+            _localUserService.AutoProvisionUser(provider, providerUserId, claims.ToList());
+            await _localUserService.SaveChangesAsync();
+        }
 
         // this allows us to collect any additional claims or properties
         // for the specific protocols used and store them in the local auth cookie.
@@ -86,9 +88,9 @@ public class Callback : PageModel
         CaptureExternalLoginContext(result, additionalLocalClaims, localSignInProps);
             
         // issue authentication cookie for user
-        var isuser = new IdentityServerUser(providerUserId)
+        var isuser = new IdentityServerUser(user.Subject)
         {
-            DisplayName = providerUserId,
+            DisplayName = user.UserName,
             IdentityProvider = provider,
             AdditionalClaims = additionalLocalClaims
         };
@@ -103,7 +105,14 @@ public class Callback : PageModel
 
         // check if external login is in the context of an OIDC request
         var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
-        await _events.RaiseAsync(new UserLoginSuccessEvent(provider, providerUserId, providerUserId, providerUserId, true, context?.Client.ClientId));
+        await _events.RaiseAsync(
+            new UserLoginSuccessEvent(
+                provider: provider,
+                providerUserId: providerUserId,
+                subjectId: user.Subject,
+                name: user.UserName,
+                interactive: true,
+                clientId: context?.Client.ClientId));
         Telemetry.Metrics.UserLogin(context?.Client.ClientId, provider!);
 
         if (context != null)
