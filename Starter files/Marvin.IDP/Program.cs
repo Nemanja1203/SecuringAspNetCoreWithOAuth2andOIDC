@@ -25,6 +25,10 @@ try
 
     app.Run();
 }
+catch (HostAbortedException)
+{
+    // eat exception, cfr https://github.com/dotnet/efcore/issues/29809 
+}
 catch (Exception ex)
 {
     Log.Fatal(ex, "Unhandled exception");
