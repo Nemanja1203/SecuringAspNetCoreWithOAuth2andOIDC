@@ -23,6 +23,8 @@ namespace Marvin.IDP.Services
 
         void AddUser(User userToAdd, string password);
 
+        Task<bool> AddUserSecret(string subject, string name, string secret);
+
         Task<bool> IsUserActive(string subject);
 
         Task<bool> ActivateUserAsync(string securityCode);
