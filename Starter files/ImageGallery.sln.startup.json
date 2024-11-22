@@ -57,6 +57,13 @@
         "ImageGallery.API": {}
       }
     },
+    "Marvin.IDP - Seed Data": {
+      "Projects": {
+        "Marvin.IDP": {
+          "CommandLineArguments": "/seed"
+        }
+      }
+    },
     "API & Client": {
       "Projects": {
         "ImageGallery.API": {},
