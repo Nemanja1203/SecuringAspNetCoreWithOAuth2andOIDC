@@ -1,5 +1,8 @@
-﻿using Marvin.IDP;
+using Marvin.IDP;
 using Serilog;
+using Marvin.IDP.Data;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()

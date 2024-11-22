@@ -1,3 +1,7 @@
+using Marvin.IDP.Areas.Identity.Data;
+using Marvin.IDP.Data;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 namespace Marvin.IDP
@@ -8,6 +12,16 @@ namespace Marvin.IDP
         {
             // uncomment if you want to add a UI
             builder.Services.AddRazorPages();
+
+            var connectionString = builder.Configuration.GetConnectionString("MarvinIDPContextConnection")
+                ?? throw new InvalidOperationException("Connection string 'MarvinIDPContextConnection' not found.");
+
+            builder.Services.AddDbContext<MarvinIDPContext>(options =>
+                options.UseSqlite(connectionString));
+
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<MarvinIDPContext>()
+                .AddDefaultTokenProviders();
 
             builder.Services.AddIdentityServer(options =>
                 {
@@ -37,7 +51,7 @@ namespace Marvin.IDP
             app.UseRouting();
 
             app.UseIdentityServer();
-             
+
             // uncomment if you want to add a UI
             app.UseAuthorization();
             app.MapRazorPages().RequireAuthorization();
