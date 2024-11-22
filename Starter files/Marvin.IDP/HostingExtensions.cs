@@ -32,7 +32,7 @@ namespace Marvin.IDP
                 .AddInMemoryApiResources(Config.ApiResources)
                 .AddInMemoryApiScopes(Config.ApiScopes)
                 .AddInMemoryClients(Config.Clients)
-                .AddTestUsers(TestUsers.Users);
+                .AddAspNetIdentity<ApplicationUser>();
 
             return builder.Build();
         }
