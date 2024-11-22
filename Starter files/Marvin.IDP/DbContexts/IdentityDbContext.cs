@@ -11,6 +11,8 @@ namespace Marvin.IDP.DbContexts
         
         public DbSet<UserLogin> UsersLogins { get; set; }
 
+        public DbSet<UserSecret> UsersSecrets { get; set; }
+
         public IdentityDbContext(
           DbContextOptions<IdentityDbContext> options)
         : base(options)
